@@ -225,88 +225,231 @@ def tab_data_preparation():
 
 
 def tab_data_lineage():
-    """Tab 2: Data Lineage"""
-    st.markdown('<div class="sub-header">🔄 Data Lineage</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="info-box">', unsafe_allow_html=True)
-    st.markdown("""
-    **Data Governance & Lineage**
-    
-    Understanding the complete data flow from source systems through transformation
-    to the final dataset ensures data quality, compliance, and trustworthiness.
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Multi-regional architecture
-    st.markdown("### Multi-Regional Data Architecture")
-    
-    st.markdown("""
-    ```
-    REGIONAL SOURCES (4 Regions)
-    ├── 🇨🇦 Canada (ca_daily_trades)
-    ├── 🇺🇸 North America (na_daily_trades)
-    ├── 🇪🇺 Europe (eu_daily_trades)
-    └── 🌏 Asia-Pacific (apac_daily_trades)
-         ↓ ↓ ↓ ↓
-    REGIONAL AGGREGATION (SQL Procedures)
-    ├── load_ca_ww_trades_sql
-    ├── load_na_ww_trades_sql
-    ├── load_eu_ww_trades_sql
-    └── load_apac_ww_trades_sql
-         ↓ ↓ ↓ ↓
-    WORLDWIDE CONSOLIDATION
-    └── ww_daily_trades (Global Aggregation)
-         ↓
-    DUAL TRANSFORMATION PATHS
-    ├── Path 1: etl_trades-pg (Primary ETL)
-    └── Path 2: load_xfm_trades_pg (Reference Enrichment)
-         ↓ ↓
-    FINAL OUTPUT
-    └── xfm_trades (Transformed Trading Data) ⭐
-    ```
-    """)
-    
-    # Key metrics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Regional Sources", "4", help="CA, NA, EU, APAC")
-    with col2:
-        st.metric("ETL Jobs", "2", help="Primary + Enrichment")
-    with col3:
-        st.metric("Data Quality Score", "100%", help="All validation checks pass")
-    
-    # Lineage documentation
-    st.markdown("### Detailed Lineage Documentation")
+    """Tab 2: Data Lineage - IBM watsonx Style"""
+    st.markdown('<div class="sub-header">🔄 Data Lineage & Governance</div>', unsafe_allow_html=True)
     
     lineage_docs = load_lineage_docs()
     
     if lineage_docs:
-        tab1, tab2 = st.tabs(["📍 Source: ca_daily_trades", "📊 Target: xfm_trades"])
+        # Create tabs for each asset
+        tab1, tab2 = st.tabs(["📍 ca_daily_trades (Source)", "📊 xfm_trades (Target)"])
         
         with tab1:
-            if 'ca_daily_trades' in lineage_docs:
-                st.markdown("#### Canada Daily Trades - Source Table")
-                # Display full content without truncation
-                st.markdown(lineage_docs['ca_daily_trades'])
-                with st.expander("📄 View Full Documentation File"):
-                    st.code("Lineage Local/ca_daily_trades_dashboard.md", language="text")
+            st.markdown("## Canada Daily Trading Data Dashboard")
+            
+            # Executive Summary
+            st.markdown('<div class="success-box">', unsafe_allow_html=True)
+            st.markdown("""
+            ### Executive Summary
+            
+            The **ca_daily_trades** table serves as a critical source for Canada's daily trading activities
+            within the Enterprise Banking Catalogue. This asset maintains a perfect **100% data quality score**
+            and acts as the foundation for downstream trading analytics and reporting systems.
+            
+            **Business Impact**: HIGH - This table directly feeds 6 downstream components.
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Key Performance Indicators
+            st.markdown("### Key Performance Indicators")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Data Quality Score", "100%", help="All validation checks pass")
+            with col2:
+                st.metric("Downstream Assets", "6", help="Six systems depend on this data")
+            with col3:
+                st.metric("ETL Jobs", "2", help="Two automated processes")
+            with col4:
+                st.metric("Dependent Tables", "3", help="Three tables rely on this")
+            
+            # Data Lineage Flow
+            st.markdown("### Data Lineage & Business Flow")
+            st.code("""
+📍 START: ca_daily_trades (Canada Daily Trading Data)
+    ↓
+    Feeds into automated processing
+    ↓
+⚙️  load_ca_ww_trades_sql (SQL Procedure)
+    Aggregates Canadian trades with other regions
+    ↓
+📊 ww_daily_trades (Worldwide Trading Aggregation)
+    Combines all regional trading data
+    ↓
+    Splits into two transformation paths:
+    ↓
+    Path 1: Primary ETL Processing
+    ├→ 🔧 etl_trades-pg.DataStage job
+    │   ├→ 📊 xfm_trades (Transformed Trades)
+    │   └→ 📊 otco_trades (Octo Trades)
+    │
+    Path 2: Secondary Enrichment
+    └→ 🔧 load_xfm_trades_pg.DataStage job
+        └→ 📊 xfm_trades (Transformed Trades)
+            """, language="text")
+            
+            # Impact Analysis
+            st.markdown("### ⚠️ Impact Analysis")
+            st.markdown('<div class="warning-box">', unsafe_allow_html=True)
+            st.markdown("""
+            **HIGH IMPACT ALERT**: Any changes to ca_daily_trades will affect **6 downstream components**.
+            
+            #### Critical Impact (Immediate Action Required)
+            - **load_ca_ww_trades_sql** (SQL Procedure) - 🔴 HIGH
+            - **ww_daily_trades** (Table) - 🔴 HIGH
+            
+            #### Medium Impact (Coordination Required)
+            - **etl_trades-pg** (DataStage Job) - 🟡 MEDIUM
+            - **load_xfm_trades_pg** (DataStage Job) - 🟡 MEDIUM
+            
+            #### Low Impact (Monitor & Verify)
+            - **xfm_trades** (Table) - 🟢 LOW
+            - **otco_trades** (Table) - 🟢 LOW
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Asset Information
+            with st.expander("📋 Asset Information"):
+                st.markdown("""
+                - **Asset Type**: Database Table
+                - **Catalog**: Enterprise Catalogue Banking
+                - **Schema**: techxchange
+                - **Database**: ibmclouddb
+                - **Tags**: techxchange
+                - **Added**: May 06, 2026
+                """)
         
         with tab2:
-            if 'xfm_trades' in lineage_docs:
-                st.markdown("#### XFM Trades - Transformed Data")
-                # Display full content without truncation
-                st.markdown(lineage_docs['xfm_trades'])
-                with st.expander("📄 View Full Documentation File"):
-                    st.code("Lineage Local/xfm_trades_dashboard.md", language="text")
+            st.markdown("## Transformed Trading Data Dashboard")
+            
+            # Executive Summary
+            st.markdown('<div class="success-box">', unsafe_allow_html=True)
+            st.markdown("""
+            ### Executive Summary
+            
+            The **xfm_trades** table is the enterprise's consolidated repository for transformed trading data
+            from all global regions. This critical asset aggregates and enriches trading information from
+            **4 regional sources** (Canada, North America, Europe, and Asia-Pacific) and maintains a perfect
+            **100% data quality score**.
+            
+            **Business Impact**: CRITICAL - Single source of truth for transformed trading data.
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Key Performance Indicators
+            st.markdown("### Key Performance Indicators")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Data Quality Score", "100%", help="Production-ready data")
+            with col2:
+                st.metric("Upstream Assets", "9", help="Nine data sources feed this table")
+            with col3:
+                st.metric("ETL Jobs", "2", help="Two DataStage jobs")
+            with col4:
+                st.metric("Regional Tables", "4", help="CA, NA, EU, APAC")
+            
+            # Multi-Regional Architecture
+            st.markdown("### Multi-Regional Data Architecture")
+            
+            regional_data = {
+                "Region": ["🇨🇦 Canada", "🇺🇸 North America", "🇪🇺 Europe", "🌏 Asia-Pacific"],
+                "Source Table": ["ca_daily_trades", "na_daily_trades", "eu_daily_trades", "apac_daily_trades"],
+                "Coverage": ["Canadian markets", "US markets", "European markets", "APAC markets"],
+                "Purpose": ["TSX, TSX Venture", "NYSE, NASDAQ", "LSE, Euronext", "Tokyo, Hong Kong, Singapore"]
+            }
+            st.dataframe(pd.DataFrame(regional_data), width='stretch', hide_index=True)
+            
+            # Complete Transformation Journey
+            st.markdown("### The Complete Transformation Journey")
+            st.code("""
+STAGE 1: REGIONAL DATA COLLECTION
+📍 ca_daily_trades (Canada)
+📍 na_daily_trades (North America)
+📍 eu_daily_trades (Europe)
+📍 apac_daily_trades (Asia-Pacific)
+    ↓ ↓ ↓ ↓
+    Each region feeds into its own aggregation procedure
+    ↓ ↓ ↓ ↓
+
+STAGE 2: REGIONAL AGGREGATION
+⚙️  load_ca_ww_trades_sql (Canada Procedure)
+⚙️  load_na_ww_trades_sql (North America Procedure)
+⚙️  load_eu_ww_trades_sql (Europe Procedure)
+⚙️  load_apac_ww_trades_sql (Asia-Pacific Procedure)
+    ↓ ↓ ↓ ↓
+    All regional data flows into worldwide aggregation
+    ↓ ↓ ↓ ↓
+
+STAGE 3: WORLDWIDE CONSOLIDATION
+📊 ww_daily_trades (Global Trading Aggregation)
+    ↓
+    Splits into two parallel transformation paths
+    ↓
+
+STAGE 4: DUAL TRANSFORMATION PATHS
+
+Path 1: Primary ETL Processing
+├→ 🔧 etl_trades-pg.DataStage job
+│   ├─ Applies business rules
+│   ├─ Data cleansing and validation
+│   └─ Outputs to → 📊 xfm_trades (TARGET)
+
+Path 2: Reference Data Enrichment
+└→ 🔧 load_xfm_trades_pg.DataStage job
+    ├─ Enriches with 📋 isin_master reference data
+    ├─ Adds security information
+    └─ Outputs to → 📊 xfm_trades (TARGET)
+            """, language="text")
+            
+            # ETL Processing Pipeline
+            st.markdown("### ETL Processing Pipeline")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown('<div class="info-box">', unsafe_allow_html=True)
+                st.markdown("""
+                #### 🔧 Primary ETL: etl_trades-pg
+                
+                **Purpose**: Core transformation and business rules
+                
+                **Processing Steps**:
+                - ✓ Processes worldwide daily trades
+                - ✓ Applies trading business rules
+                - ✓ Data cleansing and validation
+                - ✓ Standardizes formats across regions
+                - ✓ Outputs to xfm_trades
+                """)
+                st.markdown('</div>', unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown('<div class="info-box">', unsafe_allow_html=True)
+                st.markdown("""
+                #### 🔧 Secondary ETL: load_xfm_trades_pg
+                
+                **Purpose**: Reference data enrichment
+                
+                **Processing Steps**:
+                - ✓ Enriches with ISIN master data
+                - ✓ Adds security identification
+                - ✓ Reference data lookups
+                - ✓ Security classifications
+                - ✓ Outputs to xfm_trades
+                """)
+                st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Asset Information
+            with st.expander("📋 Asset Information"):
+                st.markdown("""
+                - **Asset Type**: Database Table
+                - **Catalog**: Enterprise Catalogue Banking
+                - **Schema**: techxchange
+                - **Database**: ibmclouddb
+                - **Purpose**: Consolidated transformed trades from all regions
+                - **Regional Sources**: 4 tables (CA, NA, EU, APAC)
+                - **Total Upstream Assets**: 9 components
+                """)
     
-    # Business value
-    st.markdown("### Business Value")
-    st.markdown("""
-    - **Data Governance**: Complete audit trail from source to target
-    - **Compliance**: Regulatory requirements for data lineage
-    - **Quality Assurance**: 100% data quality score maintained
-    - **Impact Analysis**: Understand downstream effects of changes
-    """)
+    else:
+        st.warning("Lineage documentation not found. Please check the Lineage Local/ folder.")
 
 
 def tab_data_quality():
