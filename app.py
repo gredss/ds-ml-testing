@@ -191,7 +191,7 @@ def tab_data_preparation():
                 title="Settlement Status Distribution",
                 color_discrete_sequence=['#24a148', '#f1c21b', '#da1e28']
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         
         with col2:
             st.markdown("#### Class Distribution")
@@ -428,7 +428,7 @@ def tab_feature_engineering():
                 color=category_counts.values,
                 color_continuous_scale='Blues'
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         
         with col2:
             st.markdown("#### Feature Categories")
